@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyHax</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <!-- Vanilla Tilt for 3D card effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+  <!-- Particles.js for background -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <style>
+    /* Flat dark theme - inspired by gamesense.vip/forums */
+    :root {
+      --primary: #5865F2;
+      --bg: #0f0f0f;
+      --bg-card: #1e1e1e;
+      --bg-card-hover: #252525;
+      --border: #333;
+      --border-hover: #555;
+      --text: #fff;
+      --text-dim: #777;
+      --text-mid: #aaa;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: #fff;
+      background: #0f0f0f;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .glass {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      box-shadow: none;
+      border-radius: 0;
+      transition: none;
+    }
+    .glass-card {
+      background: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 0;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .glass-card:hover {
+      background: #252525;
+      border-color: #555;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-discord {
+      background: #5865F2;
+      padding: 0.6rem 1.5rem;
+      border-radius: 0;
+      font-weight: 600;
+      transition: background 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      border: 1px solid #5865F2;
+    }
+    .btn-discord:hover {
+      background: #4752C4;
+      border-color: #4752C4;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-discord::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: transparent;
+      border-radius: 0;
+      transform: none;
+      transition: none;
+    }
+    .btn-discord:hover::after {
+      width: 0;
+      height: 0;
+    }
+    /* Animations */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeInUp {
+      animation: fadeInUp 1s ease-out forwards;
+    }
+    /* Parallax Background */
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    /* Section Separator */
+    .wave {
+      position: absolute;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+    }
+    .wave svg {
+      position: relative;
+      display: block;
+      width: calc(100% + 1.3px);
+      height: 80px;
+    }
+    .wave .shape-fill {
+      fill: #1a1a1a;
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 0;
+      padding: 2rem;
+      text-align: center;
+      max-width: 900px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    /* Tab Styles */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .tab-button {
+      background: transparent;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #777;
+      transition: color 0.2s ease, background 0.2s ease;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      font-weight: 600;
+    }
+    .tab-button:hover {
+      color: #ccc;
+      background: transparent;
+    }
+    .tab-button.active {
+      color: #fff;
+      border-bottom: 2px solid #5865F2;
+      background: transparent;
+      border-radius: 0;
+    }
+    .client-chip {
+      display: inline-block;
+      background: #222;
+      border: 1px solid #444;
+      padding: 0.2rem 0.6rem;
+      border-radius: 0;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #aaa;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .client-chip:hover {
+      background: #2a2a2a;
+      border-color: #666;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Particle Background -->
+  <div id="particles-js"></div>
+  <!-- Header -->
+  <header class="glass py-4 px-6 flex justify-between items-center sticky top-0 z-20">
+    <h1 class="text-3xl font-extrabold text-white">SkyHax</h1>
+<nav>
+  <ul class="flex space-x-8 text-lg items-center">
+    <li><button class="tab-button active" onclick="openTab('clients')">Clients</button></li>
+    <li><button class="tab-button" onclick="openTab('configs')">Configs</button></li>
+    <li><button class="tab-button" onclick="openTab('serverlist')">Server List</button></li>
+    <li><button class="tab-button" onclick="openTab('other')">Other</button></li>
+    <li><button onclick="openModal()" class="btn-discord" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Join Discord</button></li>
+  </ul>
+</nav>
+  </header>
+  <!-- Hero Section -->
+  <section class="w-full py-8 relative">
+  </section>
+  <!-- Main Content -->
+  <main class="flex-grow py-24 relative">
+    <div class="container mx-auto px-4">
+      <!-- Clients Section -->
+      <section id="clients" class="tab-content active">
+        <h2 class="text-4xl font-bold text-center mb-12 animate-fadeInUp">Minecraft Clients</h2>
+        <p class="text-xl text-center text-gray-200 mb-8 animate-fadeInUp">Explore our collection of optimized Minecraft clients designed for performance and customization.</p>
+        <div id="client-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+          <!-- LiquidBounce -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" onclick="showClientDetails('client-liquidbounce')">
+            <img src="https://liquidbounce.net/images/logos/logo.svg" alt="LiquidBounce Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">LiquidBounce</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- RavenBs -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 0.2s;" onclick="showClientDetails('client-ravenbplus')">
+            <img src="https://avatars.githubusercontent.com/u/88325435?s=280&v=4" alt="RavenBs Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">RavenBs</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- Augustus -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 0.4s;" onclick="showClientDetails('client-augustus')">
+            <img src="https://electriclauncher.de/logo.webp" alt="Augustus Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">Augustus</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- Slinky -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 0.6s;" onclick="showClientDetails('client-slinky')">
+            <h3 class="text-2xl font-semibold mb-3">Slinky</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- VapeV4 -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 0.8s;" onclick="showClientDetails('client-vapev4')">
+            <img src="https://www.vape.gg/img/logo.png" alt="VapeV4 Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">VapeV4</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- Vibe Client -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 1s;" onclick="showClientDetails('client-vibe')">
+            <img src="https://cdn.discordapp.com/icons/1540327781119041557/422a0e53fe2c28e6249b452c8c225767.webp?size=512" alt="Vibe Client Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">Vibe Client</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- Meteor Client -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 1.2s;" onclick="showClientDetails('client-meteor')">
+            <img src="https://meteorclient.com/icon.png" alt="Meteor Client Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">Meteor Client</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- RavenXD -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 1.4s;" onclick="showClientDetails('client-ravenxd')">
+            <img src="https://repository-images.githubusercontent.com/809202578/de48b285-4979-4fec-af51-33ba38167f60" alt="RavenXD Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">RavenXD</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- Altmanager -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 1.6s;" onclick="showClientDetails('client-altmanager')">
+            <img src="https://media.forgecdn.net/avatars/thumbnails/1182/350/256/256/638755824818324011.png" alt="Altmanager Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">Altmanager</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- ViafabricPlus -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 1.8s;" onclick="showClientDetails('client-viafabricplus')">
+            <img src="https://media.forgecdn.net/avatars/thumbnails/869/546/256/256/638284874749299002.png" alt="ViafabricPlus Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">ViafabricPlus</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- Doomsday -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 2s;" onclick="showClientDetails('client-doomsday')">
+            <img src="https://assets-global.website-files.com/662ff817ffae75d95d2a93e4/662ffa85ecf13e98abc98ea9_Bez%20tytu%C5%82u.png" alt="Doomsday Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">Doomsday</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- ThunderHack Recode -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 2.2s;" onclick="showClientDetails('client-thunderhack')">
+            <img src="https://i.imgur.com/ZiJ0r7y.png" alt="ThunderHack Recode Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">ThunderHack Recode</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- Wurst -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 2.4s;" onclick="showClientDetails('client-wurst')">
+            <img src="https://cloud.githubusercontent.com/assets/10100202/23872350/47e8462e-082e-11e7-8ac2-07a66e4beaaa.png" alt="Wurst Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">Wurst</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+          <!-- Fate Injector -->
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 2.6s;" onclick="showClientDetails('client-fate')">
+            <img src="https://pbs.twimg.com/profile_images/1352270795490390017/G1ENLsrz_400x400.jpg" alt="Fate Injector Logo" class="w-36 h-36 mx-auto mb-6 rounded-none">
+            <h3 class="text-2xl font-semibold mb-3">Fate Injector</h3>
+            <button class="btn-discord">View Details</button>
+          </div>
+        </div>
+        <!-- Client Details Section -->
+        <div id="client-details" class="hidden">
+          <!-- LiquidBounce Details -->
+          <div id="client-liquidbounce" class="client-detail glass p-10 animate-fadeInUp">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://liquidbounce.net/images/logos/logo.svg" alt="LiquidBounce Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">LiquidBounce</h3>
+                <p class="text-lg text-gray-200 mt-4">LiquidBounce is a free and open-source mixin-based client using the Fabric API or Forge for Minecraft. This mod gives you significant advantages over other players. With its JavaScript API, you can develop your own modules and share them with the community. Customize the HUD to your exact needs with a beautiful shader-based main menu.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://liquidbounce.net/images/screenshots/main-menu.webp" alt="LiquidBounce Main Menu" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://liquidbounce.net/images/screenshots/clickgui.webp" alt="LiquidBounce ClickGUI" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://liquidbounce.net/images/screenshots/hud.webp" alt="LiquidBounce HUD" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/Gf4vVnwSKo" class="inline-block mt-8 btn-discord">Download LiquidBounce</a>
+          </div>
+          <!-- Meteor Client Details -->
+          <div id="client-meteor" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://meteorclient.com/icon.png" alt="Meteor Client Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">Meteor Client</h3>
+                <p class="text-lg text-gray-200 mt-4">Meteor Client comes with an extremely customizable GUI and HUD, giving you a beautiful but functional interface to interact with, along with powerful modules for PvP, utility, and movement. It’s a Fabric-based client ideal for anarchy servers, offering features like AutoClicker, XRay, and Fly.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://meteorclient.com/screenshot.png" alt="Meteor Client Main Menu" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://via.placeholder.com/300x200" alt="Meteor Client ClickGUI" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://via.placeholder.com/300x200" alt="Meteor Client HUD" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/DDYqF42LrF" class="inline-block mt-8 btn-discord">Download Meteor Client</a>
+          </div>
+          <!-- RavenXD Details -->
+          <div id="client-ravenxd" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://repository-images.githubusercontent.com/809202578/de48b285-4979-4fec-af51-33ba38167f60" alt="RavenXD Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">RavenXD</h3>
+                <p class="text-lg text-gray-200 mt-4">RavenXD is a well known fork of the Raven b4 client.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://i.ytimg.com/vi/Gu5HkYTEdUg/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCbdQfsJnQJlCZ2MVmPZ9Eyuwyi-w" alt="RavenXD Main Menu" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://www.9minecraft.net/wp-content/uploads/2024/07/Raven-XD-Client-Screenshots-8.jpg" alt="RavenXD ClickGUI" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://repository-images.githubusercontent.com/809202578/de48b285-4979-4fec-af51-33ba38167f60" alt="RavenXD HUD" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/YVbqXmMTSI" class="inline-block mt-8 btn-discord">Download RavenXD</a>
+          </div>
+          <!-- Altmanager Details -->
+          <div id="client-altmanager" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://media.forgecdn.net/avatars/thumbnails/1182/350/256/256/638755824818324011.png" alt="Altmanager Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">Altmanager</h3>
+                <p class="text-lg text-gray-200 mt-4">Altmanager is a utility-focused client designed to manage multiple Minecraft accounts seamlessly. It includes hack modules like AutoLogin and Account Switcher, making it ideal for players who frequently switch accounts on multiplayer servers.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://i.imgur.com/DX06VoG.png" alt="Altmanager Account Switcher" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://i.imgur.com/5hiQ6Om.png" alt="Altmanager Interface" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://static.planetminecraft.com/files/resource_media/screenshot/1528/chjinfw9139994_lrg.jpg" alt="Altmanager Settings" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/HAL1J5bBrS" class="inline-block mt-8 btn-discord">Download Altmanager</a>
+          </div>
+          <!-- ViafabricPlus Details -->
+          <div id="client-viafabricplus" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://media.forgecdn.net/avatars/thumbnails/869/546/256/256/638284874749299002.png" alt="ViafabricPlus Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">ViafabricPlus</h3>
+                <p class="text-lg text-gray-200 mt-4">ViaFabricPlus is a Fabric-based mod that enables cross-version compatibility, allowing players to join older Minecraft servers with modern features. It includes select utility modules for enhanced gameplay across different server versions.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://cdn.modrinth.com/data/rIC2XJV4/images/536c64fdf36a55d892117d75c96ab87b7b9e7a80.png" alt="ViafabricPlus Compatibility Menu" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://cdn.modrinth.com/data/rIC2XJV4/images/7f2e2f0cf90cc2c96b5cd49efa8529ad49e31fbf.png" alt="ViafabricPlus Gameplay" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://cdn.modrinth.com/data/rIC2XJV4/images/d6f01443a9e0d6d1fc13ff412070440f1e627c68.png" alt="ViafabricPlus Settings" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/KxDnZvv4Ka" class="inline-block mt-8 btn-discord">Download ViafabricPlus</a>
+          </div>
+          <!-- Doomsday Details -->
+          <div id="client-doomsday" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://assets-global.website-files.com/662ff817ffae75d95d2a93e4/662ffa85ecf13e98abc98ea9_Bez%20tytu%C5%82u.png" alt="Doomsday Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">Doomsday</h3>
+                <p class="text-lg text-gray-200 mt-4">Doomsday is a powerful hack client tailored for anarchy servers, featuring advanced PvP and griefing modules like Nuker, CrystalAura, and AutoTotem for dominating chaotic environments.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://via.placeholder.com/300x200" alt="Doomsday CrystalAura" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://via.placeholder.com/300x200" alt="Doomsday Griefing Interface" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://via.placeholder.com/300x200" alt="Doomsday HUD" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/BCvZ7FAf8q" class="inline-block mt-8 btn-discord">Download Doomsday</a>
+          </div>
+          <!-- ThunderHack Recode Details -->
+          <div id="client-thunderhack" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://i.imgur.com/ZiJ0r7y.png" alt="ThunderHack Recode Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">ThunderHack Recode</h3>
+                <p class="text-lg text-gray-200 mt-4">ThunderHack Recode is a modernized version of ThunderHack, offering advanced PvP modules, a sleek GUI, and utility features like AutoCrystal and Baritone integration for enhanced gameplay.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://i.ytimg.com/vi/Ko4hd3J3Jbo/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDLndy8fbIORvpXTbJNB3tDv8Gu4g" alt="ThunderHack Recode AutoCrystal" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://ayngm.com/zb_users/upload/2024/05/202405011714538669206126.png" alt="ThunderHack Recode GUI" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://www.9minecraft.net/wp-content/uploads/2023/10/ThunderHack-Recode-Client-Mod-Screenshots-7.jpg" alt="ThunderHack Recode HUD" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/VrItK896Cd" class="inline-block mt-8 btn-discord">Download ThunderHack Recode</a>
+          </div>
+          <!-- Wurst Details -->
+          <div id="client-wurst" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://wurstclient.net/img/logo.png" alt="Wurst Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">Wurst</h3>
+                <p class="text-lg text-gray-200 mt-4">Wurst is one of the oldest and most popular open-source hack clients, featuring a vast array of modules like ESP, Nuker, and AutoBuild for diverse gameplay needs on anarchy and SMP servers.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://images.wurstclient.net/_media/update/wurst_7.20.jpg" alt="Wurst ClickGUI" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://images.wurstclient.net/_media/update/wurst_7.39.jpg" alt="Wurst HUD" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://images.wurstclient.net/_media/update/wurst_7.23.jpg" alt="Wurst Gameplay" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/3d3IdjtXJV" class="inline-block mt-8 btn-discord">Download Wurst</a>
+          </div>
+          <!-- RavenBs Details -->
+          <div id="client-ravenbplus" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://avatars.githubusercontent.com/u/88325435?s=280&v=4" alt="RavenBs Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">RavenBs</h3>
+                <p class="text-lg text-gray-200 mt-4">RavenBs prides itself on being free, supplying enhancing mods to boost your PvP skills against sweats. It’s a Forge-based client optimized for Minecraft 1.8.9, featuring modules like KillAura and Velocity.</p>
+              </div>
+            </div>
+            <a href="https://bstlar.com/20774/JokiuSAhye" class="inline-block mt-8 btn-discord">Download RavenBs</a>
+          </div>
+          <!-- Fate Injector Details -->
+          <div id="client-fate" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://pbs.twimg.com/profile_images/1352270795490390017/G1ENLsrz_400x400.jpg" alt="Fate Injector Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">Fate Injector</h3>
+                <p class="text-lg text-gray-200 mt-4">Fate Injector is a specialized client for injecting custom hacks and mods, offering a lightweight solution for advanced users and developers looking to customize their Minecraft experience.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+              <img src="https://via.placeholder.com/300x200" alt="Fate Injector Interface" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://via.placeholder.com/300x200" alt="Fate Injector Mod Menu" class="w-full h-56 object-cover rounded-lg">
+              <img src="https://via.placeholder.com/300x200" alt="Fate Injector Gameplay" class="w-full h-56 object-cover rounded-lg">
+            </div>
+            <a href="https://bstlar.com/20774/jgVqplZFue" class="inline-block mt-8 btn-discord">Download Fate Injector</a>
+          </div>
+          <!-- Augustus Details -->
+          <div id="client-augustus" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://electriclauncher.de/logo.webp" alt="Augustus Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">Augustus</h3>
+                <p class="text-lg text-gray-200 mt-4">Augustus is a feature-rich Minecraft client offering a range of PvP and utility modules for players looking to gain an edge on anarchy and survival servers.</p>
+              </div>
+            </div>
+            <a href="https://bstlar.com/20774/EPpBM0GltE" class="inline-block mt-8 btn-discord">Download Augustus</a>
+          </div>
+          <!-- Slinky Details -->
+          <div id="client-slinky" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">Slinky</h3>
+                <p class="text-lg text-gray-200 mt-4">Slinky is a lightweight Minecraft client built for players who want a simple, no-frills set of modules for enhanced gameplay.</p>
+              </div>
+            </div>
+            <a href="https://bstlar.com/20774/B1sY6tDAqR" class="inline-block mt-8 btn-discord">Download Slinky</a>
+          </div>
+          <!-- VapeV4 Details -->
+          <div id="client-vapev4" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://www.vape.gg/img/logo.png" alt="VapeV4 Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">VapeV4</h3>
+                <p class="text-lg text-gray-200 mt-4">VapeV4 is the latest version of the Vape client, packed with polished PvP and utility modules for competitive Minecraft play.</p>
+              </div>
+            </div>
+            <a href="https://bstlar.com/20774/l0bcFee106" class="inline-block mt-8 btn-discord">Download VapeV4</a>
+          </div>
+          <!-- Vibe Client Details -->
+          <div id="client-vibe" class="client-detail glass p-10 animate-fadeInUp hidden">
+            <button class="mb-6 btn-discord" onclick="showClientGrid()">Back to Clients</button>
+            <div class="flex flex-col md:flex-row items-center gap-6">
+              <img src="https://cdn.discordapp.com/icons/1540327781119041557/422a0e53fe2c28e6249b452c8c225767.webp?size=512" alt="Vibe Client Logo" class="w-32 h-32 rounded-lg">
+              <div>
+                <h3 class="text-4xl font-bold text-white text-center">Vibe Client</h3>
+                <p class="text-lg text-gray-200 mt-4">Vibe Client is a versatile Minecraft client offering a smooth GUI and a solid set of modules for PvP and general gameplay enhancement.</p>
+              </div>
+            </div>
+            <a href="https://bstlar.com/20774/SURRQ9hRHj" class="inline-block mt-8 btn-discord">Download Vibe Client</a>
+          </div>
+        </div>
+      </section>
+      <!-- Configs Section -->
+<section id="configs" class="tab-content">
+  <h2 class="text-4xl font-bold text-center mb-12 animate-fadeInUp">Configs</h2>
+  <p class="text-xl text-center text-gray-200 mb-8 animate-fadeInUp">Find pre-made configurations for your favorite Minecraft clients to enhance your gameplay. Each config is tailored for specific servers to optimize performance.</p>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  <div class="glass-card glass p-6 text-center animate-fadeInUp cursor-pointer" style="animation-delay: 0.0s;" onclick="openConfigModal('LiquidBounce')">
+    <h3 class="text-2xl font-semibold mb-2">LiquidBounce</h3>
+    <p class="text-gray-200">Click to view configs</p>
+  </div>
+  <div class="glass-card glass p-6 text-center animate-fadeInUp cursor-pointer" style="animation-delay: 0.2s;" onclick="openConfigModal('RavenBs')">
+    <h3 class="text-2xl font-semibold mb-2">RavenBs</h3>
+    <p class="text-gray-200">Click to view configs</p>
+  </div>
+  <div class="glass-card glass p-6 text-center animate-fadeInUp cursor-pointer" style="animation-delay: 0.4s;" onclick="openConfigModal('LiquidBounce Legacy(1.8.9)')">
+    <h3 class="text-2xl font-semibold mb-2">LiquidBounce Legacy(1.8.9)</h3>
+    <p class="text-gray-200">Click to view configs</p>
+  </div>
+</div>
+  <!-- Separator -->
+  <div style="width: 100%; height: 1px; background: #222;"></div>
+</section>
+      <!-- Other Resources Section -->
+      <section id="other" class="tab-content py-24 relative">
+        <h2 class="text-4xl font-bold text-center mb-12 animate-fadeInUp">Other Resources</h2>
+        <p class="text-xl text-center text-gray-200 mb-8 animate-fadeInUp">Additional tools, mods, and resources to elevate your Minecraft experience.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div class="glass-card glass p-8 text-center animate-fadeInUp">
+            <h3 class="text-2xl font-semibold mb-3">Mod Packs</h3>
+            <p class="text-gray-200 mb-6">Curated collections for unique gameplay experiences, tailored to enhance your Minecraft adventures.</p>
+            <a href="#" class="btn-discord">Explore Mod Packs</a>
+          </div>
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 0.2s;">
+            <h3 class="text-2xl font-semibold mb-3">Texture Packs</h3>
+            <p class="text-gray-200 mb-6">Custom visuals for a fresh look, designed to make your game visually stunning.</p>
+            <a href="#" class="btn-discord">Explore Texture Packs</a>
+          </div>
+          <div class="glass-card glass p-8 text-center animate-fadeInUp" style="animation-delay: 0.4s;">
+            <h3 class="text-2xl font-semibold mb-3">Tutorials</h3>
+            <p class="text-gray-200 mb-6">Guides for setting up clients and configs to get you started quickly and efficiently.</p>
+            <a href="#" class="btn-discord">Explore Tutorials</a>
+          </div>
+        </div>
+</section>
+       <!-- Anticheat Section -->
+<section id="serverlist" class="tab-content py-24 relative">
+  <h2 class="text-4xl font-bold text-center mb-12 animate-fadeInUp">Server List</h2>
+  <p class="text-xl text-center text-gray-200 mb-8 animate-fadeInUp">Discover Minecraft servers and their anti-cheat systems</p>
+         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">BlocksMC</h3>
+             <p class="text-gray-200 mb-6">blocksmc.com – Updated NCP + Old Verus</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">ACMC.pl</h3>
+             <p class="text-gray-200 mb-6">Vulcan + Matrix</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">SuperCraft</h3>
+             <p class="text-gray-200 mb-6">mc.supercraft.es – Vulcan + NCP (scaffold)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">LibreCraft</h3>
+             <p class="text-gray-200 mb-6">librecraft.com – Matrix + NCP + Verus</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">MineLand</h3>
+             <p class="text-gray-200 mb-6">mineland.net – Intave</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Gamster</h3>
+             <p class="text-gray-200 mb-6">gamster.org – Bedwars: Polar | Skywars: Venus (GrimSkidded)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">MineBox</h3>
+             <p class="text-gray-200 mb-6">juega.minebox.es – AAC3 + NCP</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Hycraft</h3>
+             <p class="text-gray-200 mb-6">mc.hycraft.us – Polar</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">LuckyNetwork</h3>
+             <p class="text-gray-200 mb-6">luckynetwork.net – Polar</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">AcentraMC</h3>
+             <p class="text-gray-200 mb-6">acentramc.com – Vulcan + Matrix + Karhu</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">KoksCraft</h3>
+             <p class="text-gray-200 mb-6">kokscraft.pl – CustomAC + Vulcan</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">TrexMine</h3>
+             <p class="text-gray-200 mb-6">play.trexmine.com – Intave</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">PikaNetwork</h3>
+             <p class="text-gray-200 mb-6">play.pikanetwork.net – Polar</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">JartexNetwork</h3>
+             <p class="text-gray-200 mb-6">play.jartexnetwork.com – Polar</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">MineMora</h3>
+             <p class="text-gray-200 mb-6">minemora.net – AAC3.1.2 + AAC4 (dead)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Redesky</h3>
+             <p class="text-gray-200 mb-6">redesky.com – AAC5</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">HydraCraft</h3>
+             <p class="text-gray-200 mb-6">mc.hydracraft.es – Grim</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Blockdrop</h3>
+             <p class="text-gray-200 mb-6">blockdrop.org – NCP</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Mineblaze.ru</h3>
+             <p class="text-gray-200 mb-6">Intave + Matrix (bot only)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Dexland.ru</h3>
+             <p class="text-gray-200 mb-6">Intave + Matrix (bot only)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Masedworld</h3>
+             <p class="text-gray-200 mb-6">Intave + Matrix (bot only)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Mineberry</h3>
+             <p class="text-gray-200 mb-6">Intave</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">InvadedLands</h3>
+             <p class="text-gray-200 mb-6">Verus / old Verus / custom Verus + OldAGC</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Minemen Club</h3>
+             <p class="text-gray-200 mb-6">AntiGamingChair (AGC)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">MushMC</h3>
+             <p class="text-gray-200 mb-6">jogar.mush.com.br – Negative V2 + customAC</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Hylex.gg</h3>
+             <p class="text-gray-200 mb-6">Grim</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Madcraft</h3>
+             <p class="text-gray-200 mb-6">Grim</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">GommeHD</h3>
+             <p class="text-gray-200 mb-6">Intave</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">MC-Seksin.net</h3>
+             <p class="text-gray-200 mb-6">Grim (Thailand VPN)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Herobrine.org</h3>
+             <p class="text-gray-200 mb-6">Grim</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Esta.land</h3>
+             <p class="text-gray-200 mb-6">Verus + Karhu</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Cubecraft</h3>
+             <p class="text-gray-200 mb-6">AAC1.9.1.0 + Sentinel</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">mcplayhd.net</h3>
+             <p class="text-gray-200 mb-6">Verus + Intave</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">2y2c.org</h3>
+             <p class="text-gray-200 mb-6">Vulcan (earth), Matrix (bedwars)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">2b2t.org</h3>
+             <p class="text-gray-200 mb-6">Old NCP (fly check only)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">flamemc.com.br</h3>
+             <p class="text-gray-200 mb-6">No anticheat (online staff)</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">CoralMC</h3>
+             <p class="text-gray-200 mb-6">Grim + Vulcan</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Hypixel</h3>
+             <p class="text-gray-200 mb-6">Watchdog + NCP</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">3fmc</h3>
+             <p class="text-gray-200 mb-6">3fmc.com – Intave</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">MineFC</h3>
+             <p class="text-gray-200 mb-6">minefc.net – Matrix + AAC5</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Vietmine</h3>
+             <p class="text-gray-200 mb-6">Intave + Grim</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">LuckyVN</h3>
+             <p class="text-gray-200 mb-6">Random Intave/Vulcan</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">MineLegacy</h3>
+             <p class="text-gray-200 mb-6">NCP + Matrix</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">UniversoCraft</h3>
+             <p class="text-gray-200 mb-6">mc.universocraft.com – Polar</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">HazelMC</h3>
+             <p class="text-gray-200 mb-6">hazelmc.com – Vulcan</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Ghostly</h3>
+             <p class="text-gray-200 mb-6">ghostly.live – Old Vulcan</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Minemalia</h3>
+             <p class="text-gray-200 mb-6">play.minemalia.com – Vulcan</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">ColdPVP / DynamicPVP / SagePvP</h3>
+             <p class="text-gray-200 mb-6">Verus Custom</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">AstralMC / HolyPvP</h3>
+             <p class="text-gray-200 mb-6">Sparky</p>
+           </div>
+           <div class="glass-card glass p-8 text-center animate-fadeInUp">
+             <h3 class="text-2xl font-semibold mb-3">Rinaorc / Scrims</h3>
+             <p class="text-gray-200 mb-6">Polar / Grim</p>
+           </div>
+         </div>
+       </section>
+     </div>
+  </main>
+  <!-- Footer -->
+  <footer class="glass py-8 text-center">
+    <p class="text-gray-300">&copy; 2025 SkyHax. All rights reserved.</p>
+    <p class="mt-2">Follow us on <a href="https://discord.gg/jEudQy5N5U" target="_blank" class="text-indigo-300 hover:text-indigo-400 transition">Discord</a></p>
+  </footer>
+  <!-- Modal -->
+  <div id="discordModal" class="modal">
+    <div class="modal-content glass">
+      <h3 class="text-2xl font-semibold mb-4">Join Our Discord</h3>
+      <p class="mb-6 text-gray-200">Click below to join our Discord server and access your free downloads!</p>
+      <a href="https://discord.gg/jEudQy5N5U" target="_blank" class="btn-discord">Go to Discord</a>
+      <button onclick="closeModal()" class="mt-4 text-gray-500 hover:text-gray-300" style="background:none;border:none;cursor:pointer;">Close</button>
+    </div>
+  </div>
+  <!-- JavaScript -->
+<script>
+     // Smooth Scrolling
+     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+       anchor.addEventListener('click', function (e) {
+         e.preventDefault();
+         document.querySelector(this.getAttribute('href')).scrollIntoView({
+           behavior: 'smooth'
+         });
+       });
+     });
+    // GSAP Scroll Animations
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.utils.toArray('.animate-fadeInUp').forEach(element => {
+      gsap.from(element, {
+        scrollTrigger: {
+          trigger: element,
+          start: 'top 90%',
+          toggleActions: 'play none none none'
+        },
+        opacity: 0,
+        y: 10,
+        duration: 0.4,
+        ease: 'power2.out'
+      });
+    });
+    // Particles.js Configuration
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 35, density: { enable: true, value_area: 1200 } },
+        color: { value: '#ffffff' },
+        shape: { type: 'circle' },
+        opacity: { value: 0.25, random: true },
+        size: { value: 2.5, random: true },
+        line_linked: { enable: false },
+        move: { enable: true, speed: 1.2, direction: 'none', random: true, out_mode: 'out' }
+      },
+      interactivity: {
+        detect_on: 'canvas',
+        events: { onhover: { enable: false }, onclick: { enable: false } },
+        modes: { push: { particles_nb: 2 } }
+},
+       retina_detect: true
+     });
+   </script>
+<div id="configModal" class="modal">
+    <div class="modal-content glass">
+      <h3 class="text-2xl font-semibold mb-4" id="configModalTitle"></h3>
+      <div class="space-y-6" id="configModalBody"></div>
+      <button onclick="closeConfigModal()" class="mt-4 text-gray-500 hover:text-gray-300" style="background:none;border:none;cursor:pointer;">Close</button>
+    </div>
+  </div>
+
+     <script>
+      // Modal Functions
+     function openModal() {
+       document.getElementById('discordModal').style.display = 'flex';
+     }
+function closeModal() {
+        document.getElementById('discordModal').style.display = 'none';
+      }
+function openConfigModal(client) {
+  document.getElementById('configModalTitle').textContent = client + ' Configs';
+  var configs = {
+    'LiquidBounce': [
+      ['HypeMC', 'Optimized configuration for HypeMC servers.', 'https://bstlar.com/20774/q2FhI5RCIy'],
+      ['Minemen 1.21', 'Optimized for Minemen 1.21 servers.', 'https://bstlar.com/20774/h4z4cB8wx5'],
+      ['Minemen 1.8', 'Optimized for Minemen 1.8 servers.', 'https://bstlar.com/20774/rm7tDeEJOz'],
+      ['Cubecraft Full Disabler', 'Full disabler configuration for Cubecraft servers.', 'https://bstlar.com/20774/OLOqil1aGJ'],
+      ['Cheatmine (Polar)', 'Optimized for Cheatmine servers running Polar.', 'https://bstlar.com/20774/4i7RgdaHOp'],
+      ['CubeCraft', 'Optimized configuration for CubeCraft servers.', 'https://bstlar.com/20774/yDiky3xqyz']
+    ],
+    'RavenBs': [
+      ['Hypixel', 'Optimized configuration for Hypixel servers.', 'https://bstlar.com/20774/wzjgW95VWg']
+    ]
+  };
+  var list = configs[client];
+  var html = '';
+  if (list) {
+    html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">';
+    list.forEach(function(item, idx) {
+      html += '<div class="glass-card glass p-5 text-center animate-fadeInUp" style="animation-delay:' + (idx * 0.08) + 's;">';
+      html += '<h3 class="text-xl font-semibold mb-2">' + item[0] + '</h3>';
+      html += '<p class="text-gray-200 text-sm mb-2">' + item[1] + '</p>';
+      html += '<div class="flex flex-wrap gap-2 mb-6 justify-center"><span class="client-chip">' + client + '</span></div>';
+      html += '<a href="' + item[2] + '" class="btn-discord text-sm">Download Config</a>';
+      html += '</div>';
+    });
+    html += '</div>';
+  } else {
+    html = '<div class="text-center py-8"><p class="text-gray-200">Configs for ' + client + ' will be available soon.</p></div>';
+  }
+  document.getElementById('configModalBody').innerHTML = html;
+  document.getElementById('configModal').style.display = 'flex';
+}      function closeConfigModal() {
+        document.getElementById('configModal').style.display = 'none';
+      }
+    // Tab Navigation
+function openTab(tabName) {
+  const tabs = document.getElementsByClassName('tab-content');
+  const buttons = document.getElementsByClassName('tab-button');
+  for (let tab of tabs) {
+    tab.classList.remove('active');
+  }
+  for (let button of buttons) {
+    button.classList.remove('active');
+  }
+  document.getElementById(tabName).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (tabName === 'clients') {
+    showClientGrid();
+  }
+}
+    // Client Details Navigation
+    function showClientDetails(clientId) {
+      document.getElementById('client-grid').classList.add('hidden');
+      document.getElementById('client-details').classList.remove('hidden');
+      const clientDetails = document.getElementsByClassName('client-detail');
+      for (let detail of clientDetails) {
+        detail.classList.add('hidden');
+      }
+      document.getElementById(clientId).classList.remove('hidden');
+    }
+    function showClientGrid() {
+      document.getElementById('client-grid').classList.remove('hidden');
+      document.getElementById('client-details').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
