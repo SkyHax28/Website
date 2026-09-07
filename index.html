@@ -542,7 +542,7 @@
   <p class="text-xl text-center text-gray-200 mb-8 animate-fadeInUp">Find pre-made configurations for your favorite Minecraft clients to enhance your gameplay. Each config is tailored for specific servers to optimize performance.</p>
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
   <div class="glass-card glass p-6 config-card animate-fadeInUp cursor-pointer" style="animation-delay: 0.0s;" onclick="openConfigModal('LiquidBounce')">
-    <span class="config-meta mb-3">Fabric / Forge</span>
+    <span class="config-meta mb-3">Fabric</span>
     <h3 class="text-2xl font-semibold mb-2">LiquidBounce</h3>
     <p class="text-gray-200 mb-6">Seven server-focused profiles for modern LiquidBounce, from Hypixel to CubeCraft.</p>
     <button class="btn-discord">Browse 7 configs</button>
@@ -557,7 +557,7 @@
     <span class="config-meta mb-3">Forge 1.8.9</span>
     <h3 class="text-2xl font-semibold mb-2">LiquidBounce Legacy</h3>
     <p class="text-gray-200 mb-6">Legacy profiles for classic 1.8.9 servers, with room for more presets soon.</p>
-    <button class="btn-discord">Browse configs</button>
+    <button class="btn-discord">Browse 5 configs</button>
   </div>
 </div>
   <!-- Separator -->
@@ -885,7 +885,11 @@ function openConfigModal(client, selectedConfigSlug) {
       ['Hypixel', 'Optimized configuration for Hypixel server.', 'https://bstlar.com/20774/wzjgW95VWg']
     ],
     'LiquidBounce Legacy(1.8.9)': [
-      ['Hypixel Legacy', 'A legacy profile for classic Hypixel gameplay.', 'https://bstlar.com/20774/5NGZT4eUCF']
+      ['Hypixel Legacy', 'A legacy profile for classic Hypixel gameplay.', 'https://bstlar.com/20774/5NGZT4eUCF'],
+      ['Intave Fly', 'A legacy profile for servers running Intave.', 'https://bstlar.com/20774/nw1IT2kTSg'],
+      ['Intave', 'A legacy profile for servers running Intave.', 'https://bstlar.com/20774/v2hXVd4Thl'],
+      ['Matrix', 'A legacy profile for servers running Matrix.', 'https://bstlar.com/20774/hm0t7SvVnn'],
+      ['MMC (Minemen)', 'A legacy profile for Minemen Club.', 'https://bstlar.com/20774/1ii7bgsPX8']
     ]
   };
   var list = configs[client];
