@@ -873,15 +873,7 @@ function openConfigModal(client, selectedConfigSlug) {
   if (list) {
     html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">';
     list.forEach(function(item, idx) {
-      html += '<div class="glass-card glass p-5 text-center animate-fadeInUp" style="animation-delay:' + (idx * 0.08) + 's;">';
-      html += '<h3 class="text-xl font-semibold mb-2">' + item[0] + '</h3>';
-      html += '<p class="text-gray-200 text-sm mb-2">' + item[1] + '</p>';
-      html += '<div class="flex flex-wrap gap-2 mb-6 justify-center"><span class="client-chip">' + client + '</span></div>';
-      var configSlug = item[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      var clientSlug = client === 'RavenBs' ? 'ravenbs' : client.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      html += '<a href="/configs/' + clientSlug + '/' + configSlug + '" onclick="event.preventDefault(); openConfigRoute(\'' + clientSlug + '\', \'' + configSlug + '\');" class="btn-discord text-sm mr-2">View Config</a>';
-      html += '<a href="' + item[2] + '" class="btn-discord text-sm">Download</a>';
-      html += '</div>';
+      html += '<a href="' + item[2] + '" class="btn-discord text-sm animate-fadeInUp" style="animation-delay:' + (idx * 0.08) + 's;">Download</a>';
     });
     html += '</div>';
   } else {
