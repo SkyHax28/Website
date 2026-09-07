@@ -847,8 +847,8 @@
 function closeModal() {
         document.getElementById('discordModal').style.display = 'none';
       }
-function openConfigModal(client) {
-  document.getElementById('configModalTitle').textContent = client + ' Configs';
+function openConfigModal(client, selectedConfigSlug) {
+  document.getElementById('configModalTitle').textContent = selectedConfigSlug ? client + ' Config' : client + ' Configs';
   var configs = {
     'LiquidBounce': [
       ['Hypixel', 'Optimized configuration for Hypixel server.', 'https://bstlar.com/20774/5NGZT4eUCF'],
@@ -864,6 +864,11 @@ function openConfigModal(client) {
     ]
   };
   var list = configs[client];
+  if (selectedConfigSlug && list) {
+    list = list.filter(function(item) {
+      return item[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') === selectedConfigSlug;
+    });
+  }
   var html = '';
   if (list) {
     html += '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">';
@@ -872,7 +877,10 @@ function openConfigModal(client) {
       html += '<h3 class="text-xl font-semibold mb-2">' + item[0] + '</h3>';
       html += '<p class="text-gray-200 text-sm mb-2">' + item[1] + '</p>';
       html += '<div class="flex flex-wrap gap-2 mb-6 justify-center"><span class="client-chip">' + client + '</span></div>';
-      html += '<a href="' + item[2] + '" class="btn-discord text-sm">Download Config</a>';
+      var configSlug = item[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      var clientSlug = client === 'RavenBs' ? 'ravenbs' : client.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      html += '<a href="/configs/' + clientSlug + '/' + configSlug + '" onclick="event.preventDefault(); openConfigRoute(\'' + clientSlug + '\', \'' + configSlug + '\');" class="btn-discord text-sm mr-2">View Config</a>';
+      html += '<a href="' + item[2] + '" class="btn-discord text-sm">Download</a>';
       html += '</div>';
     });
     html += '</div>';
@@ -881,7 +889,12 @@ function openConfigModal(client) {
   }
   document.getElementById('configModalBody').innerHTML = html;
   document.getElementById('configModal').style.display = 'flex';
-}      function closeConfigModal() {
+}
+function openConfigRoute(clientSlug, configSlug) {
+  history.pushState({}, '', '/configs/' + clientSlug + '/' + configSlug);
+  openConfigModal(clientSlug === 'ravenbs' ? 'RavenBs' : 'LiquidBounce', configSlug);
+}
+function closeConfigModal() {
         document.getElementById('configModal').style.display = 'none';
       }
     // Tab Navigation
@@ -895,13 +908,18 @@ function openTab(tabName) {
     button.classList.remove('active');
   }
   document.getElementById(tabName).classList.add('active');
-  event.currentTarget.classList.add('active');
+  document.querySelector('[onclick="openTab(\'' + tabName + '\')"]').classList.add('active');
+  history.pushState({}, '', tabName === 'clients' ? '/' : '/' + tabName);
   if (tabName === 'clients') {
     showClientGrid();
   }
 }
     // Client Details Navigation
-    function showClientDetails(clientId) {
+    function showClientDetails(clientId, updateHistory) {
+      if (updateHistory !== false) {
+        const clientSlug = clientId.replace(/^client-/, '');
+        history.pushState({}, '', '/' + clientSlug);
+      }
       document.getElementById('client-grid').classList.add('hidden');
       document.getElementById('client-details').classList.remove('hidden');
       const clientDetails = document.getElementsByClassName('client-detail');
@@ -910,10 +928,62 @@ function openTab(tabName) {
       }
       document.getElementById(clientId).classList.remove('hidden');
     }
-    function showClientGrid() {
+    function showClientGrid(updateHistory) {
+      if (updateHistory !== false) {
+        history.pushState({}, '', '/');
+      }
       document.getElementById('client-grid').classList.remove('hidden');
       document.getElementById('client-details').classList.add('hidden');
     }
+
+    function routeFromUrl() {
+      const redirectedRoute = new URLSearchParams(window.location.search).get('route');
+      if (redirectedRoute && window.location.pathname === '/') {
+        history.replaceState({}, '', redirectedRoute);
+      }
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+      const clientIds = Array.from(document.getElementsByClassName('client-detail')).map(function(detail) {
+        return detail.id;
+      });
+      const clientId = 'client-' + path;
+
+      if (clientIds.indexOf(clientId) !== -1) {
+        openTabWithoutHistory('clients');
+        showClientDetails(clientId, false);
+        return;
+      }
+
+      if (path.indexOf('configs/') === 0) {
+        const parts = path.split('/');
+        const clientSlug = parts[1];
+        if (clientSlug === 'liquidbounce' || clientSlug === 'ravenbs') {
+          openTabWithoutHistory('configs');
+          openConfigModal(clientSlug === 'ravenbs' ? 'RavenBs' : 'LiquidBounce', parts[2]);
+          return;
+        }
+      }
+
+      if (path === 'configs' || path === 'serverlist' || path === 'other') {
+        openTabWithoutHistory(path);
+        return;
+      }
+
+      openTabWithoutHistory('clients');
+      showClientGrid(false);
+    }
+
+    function openTabWithoutHistory(tabName) {
+      const tabs = document.getElementsByClassName('tab-content');
+      const buttons = document.getElementsByClassName('tab-button');
+      for (let tab of tabs) tab.classList.remove('active');
+      for (let button of buttons) button.classList.remove('active');
+      document.getElementById(tabName).classList.add('active');
+      document.querySelector('[onclick="openTab(\'' + tabName + '\')"]').classList.add('active');
+      if (tabName === 'clients') showClientGrid(false);
+    }
+
+    window.addEventListener('popstate', routeFromUrl);
+    routeFromUrl();
   </script>
 </body>
 </html>
