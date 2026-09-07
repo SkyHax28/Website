@@ -873,19 +873,19 @@ function openConfigModal(client, selectedConfigSlug) {
   document.getElementById('configModalTitle').textContent = selectedConfigSlug ? client + ' Config' : client + ' Configs';
   var configs = {
     'LiquidBounce': [
-      ['Hypixel', 'Optimized configuration for Hypixel server.', '1.21', 'PvP / Ranked', 'https://bstlar.com/20774/5NGZT4eUCF'],
-      ['HypeMC', 'Optimized configuration for HypeMC server.', '1.21', 'PvP / Utility', 'https://bstlar.com/20774/q2FhI5RCIy'],
-      ['Minemen 1.21', 'Optimized for Minemen 1.21 server.', '1.21', 'Practice / PvP', 'https://bstlar.com/20774/h4z4cB8wx5'],
-      ['Minemen 1.8', 'Optimized for Minemen 1.8 server.', '1.8.9', 'Practice / PvP', 'https://bstlar.com/20774/rm7tDeEJOz'],
-      ['Cubecraft Full Disabler', 'Full disabler configuration for Cubecraft server.', '1.21', 'Utility / Disabler', 'https://bstlar.com/20774/OLOqil1aGJ'],
-      ['Cheatmine (Polar)', 'Optimized for Cheatmine and other servers running Polar.', '1.21', 'Polar / Utility', 'https://bstlar.com/20774/4i7RgdaHOp'],
-      ['CubeCraft', 'Optimized configuration for CubeCraft server.', '1.21', 'PvP / Utility', 'https://bstlar.com/20774/yDiky3xqyz']
+      ['Hypixel', 'Optimized configuration for Hypixel server.', 'https://bstlar.com/20774/5NGZT4eUCF'],
+      ['HypeMC', 'Optimized configuration for HypeMC server.', 'https://bstlar.com/20774/q2FhI5RCIy'],
+      ['Minemen 1.21', 'Optimized for Minemen 1.21 server.', 'https://bstlar.com/20774/h4z4cB8wx5'],
+      ['Minemen 1.8', 'Optimized for Minemen 1.8 server.', 'https://bstlar.com/20774/rm7tDeEJOz'],
+      ['Cubecraft Full Disabler', 'Full disabler configuration for Cubecraft server.', 'https://bstlar.com/20774/OLOqil1aGJ'],
+      ['Cheatmine (Polar)', 'Optimized for Cheatmine and other servers running Polar.', 'https://bstlar.com/20774/4i7RgdaHOp'],
+      ['CubeCraft', 'Optimized configuration for CubeCraft server.', 'https://bstlar.com/20774/yDiky3xqyz']
     ],
     'RavenBs': [
-      ['Hypixel', 'Optimized configuration for Hypixel server.', '1.8.9', 'PvP / Ranked', 'https://bstlar.com/20774/wzjgW95VWg']
+      ['Hypixel', 'Optimized configuration for Hypixel server.', 'https://bstlar.com/20774/wzjgW95VWg']
     ],
     'LiquidBounce Legacy(1.8.9)': [
-      ['Hypixel Legacy', 'A legacy profile for classic Hypixel gameplay.', '1.8.9', 'PvP / Utility', 'https://bstlar.com/20774/5NGZT4eUCF']
+      ['Hypixel Legacy', 'A legacy profile for classic Hypixel gameplay.', 'https://bstlar.com/20774/5NGZT4eUCF']
     ]
   };
   var list = configs[client];
@@ -901,11 +901,9 @@ function openConfigModal(client, selectedConfigSlug) {
       var configSlug = item[0].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       var clientSlug = client.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       html += '<article class="glass-card glass p-5 config-card animate-fadeInUp" style="animation-delay:' + (idx * 0.08) + 's;">';
-      html += '<span class="config-meta mb-3">' + item[2] + ' / ' + item[3] + '</span>';
       html += '<h3 class="text-xl font-semibold mb-2">' + item[0] + '</h3>';
       html += '<p class="text-gray-200 text-sm mb-4">' + item[1] + '</p>';
-      html += '<div class="flex flex-wrap gap-2 mb-5"><span class="client-chip">' + client + '</span><span class="client-chip">Ready to use</span></div>';
-      html += '<a href="' + item[4] + '" class="btn-discord text-sm" onclick="history.pushState({}, \'\', \'/configs/\' + clientSlug + \'/\' + configSlug);">Download Config</a>';
+      html += '<a href="' + item[2] + '" class="btn-discord text-sm" onclick="history.pushState({}, \'\', \'/configs/\' + clientSlug + \'/\' + configSlug);">Download Config</a>';
       html += '</article>';
     });
     html += '</div>';
